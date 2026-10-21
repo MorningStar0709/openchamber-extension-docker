@@ -1,0 +1,64 @@
+export const el = <K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className = '',
+  text = '',
+  children: Node[] = [],
+): HTMLElementTagNameMap[K] => {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text) node.textContent = text;
+  if (children.length > 0) node.append(...children);
+  return node;
+};
+
+/** A text button: no fill, it only changes colour. */
+export const textButton = (label: string, onClick: () => void, className = ''): HTMLButtonElement => {
+  const button = el('button', `tb ${className}`.trim(), label);
+  button.type = 'button';
+  button.addEventListener('click', (event) => {
+    // Inside a clickable row, the click is the button's alone.
+    event.stopPropagation();
+    onClick();
+  });
+  return button;
+};
+
+/**
+ * Keeps one child per key, in order: existing children are updated in place,
+ * so focus, open menus and hover survive the two-second refresh.
+ */
+export const reconcile = <T, V extends { element: HTMLElement }>(
+  parent: HTMLElement,
+  views: Map<string, V>,
+  items: T[],
+  key: (item: T) => string,
+  create: (item: T) => V,
+  update: (view: V, item: T) => void,
+  dispose?: (view: V) => void,
+): void => {
+  const seen = new Set<string>();
+  let cursor: ChildNode | null = parent.firstChild;
+  for (const item of items) {
+    const id = key(item);
+    seen.add(id);
+    let view = views.get(id);
+    if (!view) {
+      view = create(item);
+      views.set(id, view);
+    }
+    update(view, item);
+    if (view.element !== cursor) parent.insertBefore(view.element, cursor);
+    else cursor = cursor.nextSibling;
+  }
+  for (const [id, view] of views) {
+    if (seen.has(id)) continue;
+    dispose?.(view);
+    view.element.remove();
+    views.delete(id);
+  }
+};
+
+/** Sets text only when it changed, so selection inside it survives a refresh. */
+export const setText = (node: HTMLElement, value: string): void => {
+  if (node.textContent !== value) node.textContent = value;
+};

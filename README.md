@@ -1,72 +1,45 @@
-# Docker extension for OpenChamber
+# Docker for OpenChamber
 
-A comprehensive OpenChamber GUI panel to inspect and manage Docker containers, Docker Compose stacks, images, volumes, networks, and system storage.
+Your project's containers next to the chat. The Docker panel puts the Compose stack of the open project first, with live CPU and memory, its ports one click away, and Up, Restart and Down for the whole stack. Other stacks fold below it, then containers on their own.
 
-It shells out to the `docker` binary on PATH using host execution permissions (`permissions.exec`).
+When a container crashes or turns unhealthy, a line under it says why, read from its last log lines by your Small Model. While the panel is closed, the rail icon counts the containers that crashed since you last looked.
 
-![Docker Panel Overview](assets/overview.png)
+## What's in it
 
-## Features
+- **The panel.** Click a container for its Logs, Files, Shell and Inspect. Logs follow live, filter, and copy; Files browses the container and opens text files; Shell runs one command at a time in the folder the last one left, with `cd` carrying over; Inspect shows ports, networks, mounts and environment, with values that look like secrets hidden until clicked.
+- **Storage.** Disk space by images, build cache, volumes and stopped containers, a cleanup for each, and the images, volumes and networks themselves. Pull an image from here. Everything that deletes asks once on the button before it runs.
+- **Work Status.** A section in the chat's Work Status panel with the open project's stack, and Up, Restart and Down in its header.
+- **`/docker <name>`.** Attaches a container's state and its last 200 log lines to your message, so the agent reads what you see. Without a name it picks the project's container that crashed. "Attach to chat" in the Logs tab does the same.
+- **Docker not running.** The panel says which engine the docker CLI uses (Colima, Docker Desktop, OrbStack, Rancher Desktop, Podman) and starts it with one click when it can.
 
-### Containers & Docker Compose
-- **Container Lifecycle Management**: Start, stop, restart, pause, unpause, and force-remove containers.
-- **Compose Project Grouping**: Automatic visual grouping of containers by Docker Compose project with project-level batch controls (start, stop, restart project).
-- **Live Resource Usage**: Compact real-time CPU and RAM metrics for running containers (e.g. `CPU 1.2% · RAM 185MB`).
-- **Port Forwarding**: One-click opening of exposed container host ports.
-- **Multi-Select & Bulk Actions**: Select multiple containers for simultaneous start, stop, restart, or removal operations.
-- **Status Filters**: Quick filtering by `All`, `Running`, or `Stopped` status.
+The panel never runs a stack's commands by itself; every change is a click. Without Docker Compose installed, stacks still start, stop and restart container by container, but Up can't create a stack from its file and Down becomes Stop.
 
-### Inspection & Debugging
-- **Real-Time Logs Viewer**: Stream container logs with syntax highlighting for log levels (INFO, WARN, ERR, timestamps, JSON keys), search filtering, line wrapping, line numbers, and auto-scroll toggles.
-- **Interactive Container Shell Exec**: Execute custom shell commands (`sh`, `bash`, `ls`, `env`, etc.) inside running containers with preset quick shortcuts and output history.
-- **Container File System Browser**: Explore container directory trees, list file permissions and sizes, and preview text file contents directly inside the panel.
-- **Resource Inspector**: Searchable JSON and key-value metadata view for inspect objects across containers, images, volumes, and networks.
+## Install
 
-### Storage & System Management
-- **Image Management**: View local images with repository tags, IDs, size, and creation date, with support for deleting dangling or unused images.
-- **Volume Management**: List Docker volumes, driver details, and prune unused storage volumes.
-- **Network Inspector**: Browse Docker networks (bridge, host, overlay, macvlan), view network drivers, scopes, and attached containers.
-- **System Usage Dashboard**: View overall Docker storage breakdown (`docker system df`), estimate reclaimable disk space, and execute one-click pruning for containers, images, volumes, and build cache.
+In OpenChamber, open Settings → Extensions and add this repository's Git URL. Approve what it asks for:
 
-## Screenshots
+- **Local service.** A small process OpenChamber starts next to the panel; it runs `docker` (and `docker compose`), and `colima`, `orb` or `open -a` when you press Start for your engine. It runs with your user's rights, like any command in your terminal.
+- **Small Model.** For the one-line crash reasons. Without it, or without a Small Model set, the panel works the same and those lines don't appear.
 
-| Overview & Containers | Logs Viewer |
-| --- | --- |
-| ![Containers View](assets/containers.png) | ![Logs Viewer](assets/logs.png) |
+Requires OpenChamber 2.5.0 or newer and the `docker` CLI. Web and desktop; the phone app and VS Code don't load extensions.
 
-| File System Browser | Exec & Inspector |
-| --- | --- |
-| ![File System Browser](assets/filesystem.png) | ![Exec & Inspector](assets/exec.png) |
+## How it stays light
 
-## Prerequisites
+The service watches `docker events` instead of polling, so the container list changes when Docker says it did. `docker stats` runs only while a panel or the Work Status section is on screen, and stops twenty seconds after the last look. With nothing open for ninety seconds, both stop. A closed panel asks for new crashes every fifteen seconds; that reads the crashes the service already saw in the events and starts no Docker command while Docker is up.
 
-- `docker` CLI installed and accessible on PATH.
-- OpenChamber version 1.22.0 or higher.
+Logs arrive in steps: the last 500 lines, then only what's new every two seconds.
 
-## Installation
+## Build
 
-### Option 1: Install from release archive (.zip)
+```bash
+bun install
+bun run build      # writes panel/main.js, status/main.js, background/main.js and service/main.js
+bun run test
+bun run typecheck
+bun run pack       # docker-extension.zip
+```
 
-1. Download `docker-extension.zip` from the latest [GitHub Release](https://github.com/openchamber/openchamber-extension-docker/releases).
-2. In OpenChamber, open Settings -> Extensions -> Add Extension.
-3. Select the downloaded `.zip` archive or extracted directory.
-4. Allow local agent execution when prompted.
-
-### Option 2: Install from Git repository
-
-1. In OpenChamber, open Settings -> Extensions -> Add Extension.
-2. Provide the Git repository URL:
-   `https://github.com/openchamber/openchamber-extension-docker.git`
-   *(Or clone the repository locally and select the folder).*
-3. Allow local agent execution when prompted.
-
-## Development
-
-If you are modifying the extension source code:
-
-- `bun run bundle`: Bundles `panel/main.ts` into `panel/main.js`.
-- `bun run type-check`: Runs TypeScript type checking without emitting files.
-- `bun run pack`: Creates `docker-extension.zip` archive ready for distribution.
+The built files are committed: OpenChamber installs extensions from Git without building them. Bump `version` in `package.json` to ship an update.
 
 ## License
 

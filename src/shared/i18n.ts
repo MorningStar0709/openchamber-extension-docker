@@ -139,6 +139,7 @@ const PATTERNS: Array<[RegExp, (...match: string[]) => string]> = [
   [/^Showing the first (\d+) entries\.$/, (_all, count) => `仅显示前 ${count} 条。`],
   [/^Showing the first ([\d.]+ ?(?:KB|MB|GB))\.$/, (_all, size) => `仅显示前 ${size}。`],
   [/^(\d+ 个容器), (\d+) running$/, (_all, count, running) => `${count}，${running} 个运行中`],
+  [/^(\d+ 个容器), (\d+) running(.*)$/, (_all, count, running, rest) => `${count}，${running} 个运行中${rest}`],
   [/^(\d+) running$/, (_all, running) => `${running} 个运行中`],
   [/^(\d+)\/(\d+) running$/, (_all, running, total) => `${running}/${total} 运行中`],
   [/^Take (.+) down\?$/, (_all, project) => `停止 ${project}？`],

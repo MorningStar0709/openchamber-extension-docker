@@ -15,6 +15,10 @@ const MINUTE = 60_000;
 export const CONTAINER_ACTIONS = ['start', 'stop', 'restart', 'pause', 'unpause', 'remove'] as const;
 export type ContainerAction = typeof CONTAINER_ACTIONS[number];
 
+// `Pulling ${image}` labels bypass PRESENT (a pull is not a container
+// action); exported so the guard test sweeps it with the verb tables.
+export const PULL_LABEL = 'Pulling';
+
 export const PRESENT: Record<ContainerAction, string> = {
   start: 'Starting',
   stop: 'Stopping',
@@ -119,7 +123,7 @@ export const pullImage = (monitor: Monitor, ref: string): Job => {
     kind: 'pull',
     target: clean,
     action: 'pull',
-    label: `Pulling ${clean}`,
+    label: `${PULL_LABEL} ${clean}`,
     steps: [{ argv: ['docker', 'pull', clean] }],
     timeoutMs: 20 * MINUTE,
     onDone: () => {

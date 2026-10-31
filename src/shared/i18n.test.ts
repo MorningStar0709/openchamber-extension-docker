@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { PRUNE, PRESENT, STACK_PRESENT } from '../service/actions.ts';
+import { PRUNE, PULL_LABEL, PRESENT, STACK_PRESENT } from '../service/actions.ts';
 import { plural } from './format.ts';
 import { setLocale, t } from './i18n.ts';
 
@@ -38,14 +38,29 @@ describe('t', () => {
 describe('job labels from the service', () => {
   test('every running verb translates with the name kept', () => {
     setLocale('zh-CN');
-    const verbs = [...Object.values(PRESENT), ...Object.values(STACK_PRESENT)];
+    const verbs = [...Object.values(PRESENT), ...Object.values(STACK_PRESENT), PULL_LABEL];
     for (const verb of [...new Set(verbs)]) {
+      // not.toContain('undefined'): RUNNING is keyed by hand, a verb with a
+      // pattern but no map entry would otherwise pass on the 正在 prefix.
+      // not.toContain(verb): a half-translation keeps the English verb.
       expect(t(`${verb} web…`), verb).toMatch(hasChinese);
+      expect(t(`${verb} web…`), verb).not.toContain('undefined');
+      expect(t(`${verb} web…`), verb).not.toContain(verb);
       expect(t(`${verb} web failed: exit 1`), verb).toMatch(hasChinese);
+      expect(t(`${verb} web failed: exit 1`), verb).not.toContain('undefined');
+      expect(t(`${verb} web failed: exit 1`), verb).not.toContain(verb);
     }
     for (const { label } of Object.values(PRUNE)) {
       expect(t(`${label}…`), label).toMatch(hasChinese);
+      expect(t(`${label}…`), label).not.toContain(label);
+      // A failed prune toast must not fall into the generic verb pattern and
+      // half-translate (`正在移除 unused images 失败：…`).
+      expect(t(`${label} failed: exit 1`), label).toMatch(hasChinese);
+      expect(t(`${label} failed: exit 1`), label).not.toContain(label);
     }
+    // Composed row details translate their parts before joining; a pattern
+    // must never rewrite one from the outside.
+    expect(t('nginx:latest · just started')).toBe('nginx:latest · just started');
   });
 
   test('finished-job and toast sentences translate', () => {

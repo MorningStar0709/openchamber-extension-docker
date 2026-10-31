@@ -709,6 +709,7 @@ var readStorage = async (containers) => {
 // src/service/actions.ts
 var MINUTE = 60000;
 var CONTAINER_ACTIONS = ["start", "stop", "restart", "pause", "unpause", "remove"];
+var PULL_LABEL = "Pulling";
 var PRESENT = {
   start: "Starting",
   stop: "Stopping",
@@ -799,7 +800,7 @@ var pullImage = (monitor, ref) => {
     kind: "pull",
     target: clean,
     action: "pull",
-    label: `Pulling ${clean}`,
+    label: `${PULL_LABEL} ${clean}`,
     steps: [{ argv: ["docker", "pull", clean] }],
     timeoutMs: 20 * MINUTE,
     onDone: () => {

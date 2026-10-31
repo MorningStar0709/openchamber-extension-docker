@@ -68,7 +68,10 @@ export const localizeTree = (root: HTMLElement): void => {
   while (walker.nextNode()) {
     const node = walker.currentNode as Text;
     const parent = node.parentElement;
-    if (!parent || skipped.has(parent.tagName) || parent.closest('.output, .logs, pre, code')) continue;
+    // Data, not UI: log lines, shell transcripts and command output must
+    // reach the reader verbatim — the patterns would rewrite e.g.
+    // "worker started" into half-Chinese.
+    if (!parent || skipped.has(parent.tagName) || parent.closest('.output, .logs, .log-line, .cmd, .out, .exit, pre, code')) continue;
     nodes.push(node);
   }
   for (const node of nodes) {

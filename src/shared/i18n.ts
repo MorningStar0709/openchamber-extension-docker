@@ -17,6 +17,7 @@ const ZH: Record<string, string> = {
   'Build cache': '构建缓存',
   'Check again': '重试',
   'Clean up': '清理',
+  'Clearing the build cache': '清空构建缓存',
   'Clearing the build cache…': '正在清空构建缓存…',
   'Clear the build cache?': '清空构建缓存？',
   'Command': '命令',
@@ -86,9 +87,12 @@ const ZH: Record<string, string> = {
   'Remove…': '移除…',
   'Remove': '移除',
   'Removing…': '正在移除…',
-  'Removing unused images…': '正在移除未使用的镜像…',
-  'Removing unused volumes…': '正在移除未使用的卷…',
+  'Removing stopped containers': '移除已停止的容器',
   'Removing stopped containers…': '正在移除已停止的容器…',
+  'Removing unused images': '移除未使用的镜像',
+  'Removing unused images…': '正在移除未使用的镜像…',
+  'Removing unused volumes': '移除未使用的卷',
+  'Removing unused volumes…': '正在移除未使用的卷…',
   'Restart': '重启',
   'Resume': '恢复',
   'Shell': '终端',
@@ -128,7 +132,9 @@ const ZH: Record<string, string> = {
 };
 
 // Job verbs the service puts into labels (`Stopping web`); the panel renders
-// them with `…`, so the running forms carry the ellipsis here.
+// them with `…`, so the running forms carry the ellipsis here. The regex
+// alternations below derive from these keys: a verb listed here cannot drift
+// out of the patterns, and the guard test rejects one without a translation.
 const RUNNING: Record<string, string> = {
   Starting: '启动',
   Stopping: '停止',
@@ -140,10 +146,16 @@ const RUNNING: Record<string, string> = {
   'Taking down': '停止',
 };
 
+const RUNNING_ALTS = Object.keys(RUNNING).join('|');
+// The four cleanup job labels from src/service/actions.ts PRUNE, spelled out
+// so a failed prune reads fully Chinese; the guard test pins this list to the
+// table, and the bare dictionary keys above to the answers.
+const PRUNE_ALTS = ['Removing unused images', 'Removing unused volumes', 'Removing stopped containers', 'Clearing the build cache'].join('|');
+
 const PATTERNS: Array<[RegExp, (...match: string[]) => string]> = [
-  [/^Starting (.+)…$/, (_all, name) => `正在启动 ${name}…`],
-  [/^(Stopping|Restarting|Pausing|Resuming|Removing|Pulling|Taking down) (.+)…$/, (_all, verb, name) => `正在${RUNNING[verb]} ${name}…`],
-  [/^(Starting|Stopping|Restarting|Pausing|Resuming|Removing|Pulling|Taking down) (.+) failed: ([\s\S]+)$/, (_all, verb, name, reason) => `正在${RUNNING[verb]} ${name} 失败：${reason}`],
+  [new RegExp(`^(${PRUNE_ALTS}) failed: ([\\s\\S]+)$`), (_all, label, reason) => `${t(label)} 失败：${reason}`],
+  [new RegExp(`^(${RUNNING_ALTS}) (.+)…$`), (_all, verb, name) => `正在${RUNNING[verb]} ${name}…`],
+  [new RegExp(`^(${RUNNING_ALTS}) (.+) failed: ([\\s\\S]+)$`), (_all, verb, name, reason) => `${RUNNING[verb]} ${name} 失败：${reason}`],
   [/^Start (.+)$/, (_all, name) => `启动 ${name}`],
   [/^Pulled (.+)$/, (_all, name) => `已拉取 ${name}`],
   [/^(.+) is up$/, (_all, name) => `${name} 已启动`],
@@ -151,7 +163,9 @@ const PATTERNS: Array<[RegExp, (...match: string[]) => string]> = [
   [/^Stopped (.+)$/, (_all, name) => `已停止 ${name}`],
   [/^Restarted (.+)$/, (_all, name) => `已重启 ${name}`],
   [/^Freed (.+)$/, (_all, size) => `释放 ${size}`],
-  [/^(.+) started$/, (_all, name) => `${name} 已启动`],
+  // `[^·,]`: the engine sentence ends bare (`colima started`); a composed row
+  // detail (`nginx · created, never started`) must fall through untouched.
+  [/^([^·,]+) started$/, (_all, name) => `${name} 已启动`],
   [/^(.+) isn't installed$/, (_all, name) => `未安装 ${name}`],
   [/^(.+) isn't running$/, (_all, name) => `${name} 未运行`],
   [/^context (.+)$/, (_all, name) => `上下文 ${name}`],

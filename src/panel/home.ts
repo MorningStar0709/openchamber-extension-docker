@@ -120,7 +120,7 @@ const createRow = (app: App, initial: Container): RowView => {
       if (next.ports.length > 3) ports.append(el('span', 'detail', `+${next.ports.length - 3}`));
     }
     const tone = toneOf(next);
-    setText(detail, job ? `${job.label}…` : `${next.compose ? '' : `${next.image} · `}${stateLine(next)}`);
+    setText(detail, job ? t(`${job.label}…`) : `${next.compose ? '' : `${next.image} · `}${t(stateLine(next))}`);
     detail.className = job ? 'detail busy' : tone === 'bad' ? 'detail bad' : 'detail';
     detail.title = `${next.image}\n${next.id.slice(0, 12)}`;
 

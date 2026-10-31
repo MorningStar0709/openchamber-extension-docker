@@ -78,7 +78,7 @@ export const createContainerView = (app: App, initial: Container, tab: Tab): Con
     title.replaceChildren(document.createTextNode(label(row)));
     if (row.compose) title.append(el('span', 'muted', `  ${row.compose.project}`));
     const ports = row.ports.filter((port) => port.protocol === 'tcp').map((port) => `:${port.hostPort}`).join(' ');
-    setText(subtitle, gone ? 'This container was removed.' : [row.image, job ? `${job.label}…` : stateLine(row), ports].filter(Boolean).join(' · '));
+    setText(subtitle, gone ? 'This container was removed.' : [row.image, job ? t(`${job.label}…`) : t(stateLine(row)), ports].filter(Boolean).join(' · '));
     const key = gone ? 'gone' : `${row.state}/${job?.id ?? ''}/${ports}`;
     if (key === actionsKey) return;
     actionsKey = key;

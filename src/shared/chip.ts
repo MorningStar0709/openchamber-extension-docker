@@ -4,6 +4,7 @@
 import type { AttachIssueRequest, HostClient } from '@openchamber/sdk';
 
 import { getJson } from './client.ts';
+import { t } from './i18n.ts';
 import { label, stateLine } from './stacks.ts';
 import type { Container, LogsAnswer } from './types.ts';
 
@@ -42,7 +43,7 @@ export const containerChip = async (host: HostClient, row: Container): Promise<A
   return {
     providerId: PROVIDER_ID,
     id: row.id.slice(0, 12),
-    title: `${label(row)} · ${stateLine(row)}`,
+    title: `${label(row)} · ${t(stateLine(row))}`,
     url: `docker://container/${row.id.slice(0, 12)}`,
     text: `${header}\n${body}`,
     data: { containerId: row.id },

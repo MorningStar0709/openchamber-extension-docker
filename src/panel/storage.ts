@@ -3,6 +3,7 @@
 import { getJson, messageOf, postJob } from '../shared/client.ts';
 import { el, textButton } from '../shared/dom.ts';
 import { formatDisk, plural } from '../shared/format.ts';
+import { t } from '../shared/i18n.ts';
 import type { DiskCategory, ImageRow, StorageAnswer } from '../shared/types.ts';
 import { armButton, type App } from './app.ts';
 
@@ -77,7 +78,7 @@ export const createStorage = (app: App, onSummary: (total: number, reclaimable: 
           : el('span');
       rows.push(el('div', 'disk-row', '', [
         swatch,
-        el('span', '', `${meta.label} `, [el('span', 'muted', `${formatDisk(category.size)}`)]),
+        el('span', '', `${t(meta.label)} `, [el('span', 'muted', `${formatDisk(category.size)}`)]),
         el('span', 'muted num', category.reclaimable > 0 ? `${formatDisk(category.reclaimable)} free` : ''),
         action,
       ]));

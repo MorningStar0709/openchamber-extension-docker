@@ -29,7 +29,7 @@ const containerMenu = (row: Container): MenuItem[] => {
   else if (row.state === 'paused') items.push({ id: 'unpause', label: t('Resume') }, { id: 'stop', label: t('Stop') });
   else if (row.state === 'restarting') items.push({ id: 'stop', label: t('Stop') });
   else items.push({ id: 'start', label: t('Start') });
-  items.push({ separator: true }, { id: 'remove', label: 'Remove…', destructive: true });
+  items.push({ separator: true }, { id: 'remove', label: t('Remove…'), destructive: true });
   return items;
 };
 

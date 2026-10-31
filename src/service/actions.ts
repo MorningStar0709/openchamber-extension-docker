@@ -15,7 +15,7 @@ const MINUTE = 60_000;
 export const CONTAINER_ACTIONS = ['start', 'stop', 'restart', 'pause', 'unpause', 'remove'] as const;
 export type ContainerAction = typeof CONTAINER_ACTIONS[number];
 
-const PRESENT: Record<ContainerAction, string> = {
+export const PRESENT: Record<ContainerAction, string> = {
   start: 'Starting',
   stop: 'Stopping',
   restart: 'Restarting',
@@ -53,7 +53,7 @@ export type StackRequest = {
   configFiles: string[];
 };
 
-const STACK_PRESENT: Record<StackAction, string> = {
+export const STACK_PRESENT: Record<StackAction, string> = {
   up: 'Starting',
   down: 'Taking down',
   restart: 'Restarting',
@@ -129,7 +129,7 @@ export const pullImage = (monitor: Monitor, ref: string): Job => {
   });
 };
 
-const PRUNE: Record<PruneKind, { argv: string[]; label: string }> = {
+export const PRUNE: Record<PruneKind, { argv: string[]; label: string }> = {
   images: { argv: ['docker', 'image', 'prune', '-a', '-f'], label: 'Removing unused images' },
   'build-cache': { argv: ['docker', 'builder', 'prune', '-a', '-f'], label: 'Clearing the build cache' },
   volumes: { argv: ['docker', 'volume', 'prune', '-a', '-f'], label: 'Removing unused volumes' },

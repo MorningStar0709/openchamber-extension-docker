@@ -4,6 +4,7 @@ import { mountButton } from '@openchamber/sdk/ui';
 
 import { postJob } from '../shared/client.ts';
 import { el, setText, textButton } from '../shared/dom.ts';
+import { t } from '../shared/i18n.ts';
 import type { Snapshot } from '../shared/types.ts';
 import type { App } from './app.ts';
 
@@ -83,7 +84,7 @@ export const createEngineView = (app: App, banner: HTMLElement, refresh: () => v
         } else if (!starting) {
           if (engine.start?.canRun) {
             mountButton(buttons, {
-              label: `Start ${engine.name}`,
+              label: t(`Start ${engine.name}`),
               size: 'sm',
               onClick: () => {
                 startedAt = Date.now();

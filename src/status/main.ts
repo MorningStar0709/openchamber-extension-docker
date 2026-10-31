@@ -138,8 +138,8 @@ const reportJobs = (jobs: Job[]): void => {
     reported.add(job.id);
     if (!ownJobs.delete(job.id)) continue;
     if (job.state === 'failed') {
-      const last = job.output.split('\n').map((text) => text.trim()).filter(Boolean).pop() ?? 'It failed.';
-      void host.toast({ kind: 'error', message: `${job.label} failed: ${last}`, copy: job.output ? { text: job.output } : false, dismiss: true });
+      const last = job.output.split('\n').map((text) => text.trim()).filter(Boolean).pop() ?? t('It failed.');
+      void host.toast({ kind: 'error', message: t(`${job.label} failed: ${last}`), copy: job.output ? { text: job.output } : false, dismiss: true });
     }
   }
 };

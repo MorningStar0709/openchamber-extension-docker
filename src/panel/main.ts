@@ -8,6 +8,7 @@ import { isDockerChipData } from '../shared/chip.ts';
 import { FAILURE_TEXT, failureOf, fetchSnapshot, getJson, isOnScreen, messageOf, onShown, type Failure } from '../shared/client.ts';
 import { el, localizeTree } from '../shared/dom.ts';
 import { setLocale } from '../shared/format.ts';
+import { t } from '../shared/i18n.ts';
 import { BASE_STYLE, PANEL_STYLE } from '../shared/style.ts';
 import type { Incident, Job, Snapshot } from '../shared/types.ts';
 import type { App, Prefs, Tab } from './app.ts';
@@ -110,7 +111,7 @@ const app: App = {
   },
   copy: (text, what) => {
     void host.writeClipboard(text).then(
-      () => host.toast({ kind: 'success', message: what }),
+      () => host.toast({ kind: 'success', message: t(what) }),
       (error: unknown) => host.toast({ kind: 'error', message: messageOf(error) }),
     );
   },
@@ -171,11 +172,11 @@ const reportJobs = (jobs: Job[]): void => {
     if (!ownJobs.has(job.id)) continue;
     ownJobs.delete(job.id);
     if (job.state === 'failed') {
-      const last = job.output.split('\n').map((line) => line.trim()).filter(Boolean).pop() ?? 'It failed.';
-      void host.toast({ kind: 'error', message: `${job.label} failed: ${last}`, copy: job.output ? { text: job.output } : false, dismiss: true });
+      const last = job.output.split('\n').map((line) => line.trim()).filter(Boolean).pop() ?? t('It failed.');
+      void host.toast({ kind: 'error', message: t(`${job.label} failed: ${last}`), copy: job.output ? { text: job.output } : false, dismiss: true });
     } else {
       const text = doneMessage(job);
-      if (text) void host.toast({ kind: 'success', message: text });
+      if (text) void host.toast({ kind: 'success', message: t(text) });
     }
   }
   if (ended && view.kind === 'storage') storageView?.refresh();

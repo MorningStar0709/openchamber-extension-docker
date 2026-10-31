@@ -90,7 +90,9 @@ export const createFilesTab = (app: App, getContainer: () => Container): TabView
     } catch (failure) {
       if (mine !== generation) return;
       // A link to a file answers "Not a folder": open it as a file instead.
-      if (/Not a folder/.test(messageOf(failure))) {
+      // The raw message, not messageOf: the answer is translated for readers,
+      // the branch here must not depend on the locale.
+      if (/Not a folder/.test(failure instanceof Error ? failure.message : '')) {
         await openFile(target);
         return;
       }

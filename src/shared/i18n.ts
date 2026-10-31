@@ -17,6 +17,7 @@ const ZH: Record<string, string> = {
   'Build cache': '构建缓存',
   'Check again': '重试',
   'Clean up': '清理',
+  'Clearing the build cache…': '正在清空构建缓存…',
   'Clear the build cache?': '清空构建缓存？',
   'Command': '命令',
   'Command copied': '命令已复制',
@@ -85,6 +86,9 @@ const ZH: Record<string, string> = {
   'Remove…': '移除…',
   'Remove': '移除',
   'Removing…': '正在移除…',
+  'Removing unused images…': '正在移除未使用的镜像…',
+  'Removing unused volumes…': '正在移除未使用的卷…',
+  'Removing stopped containers…': '正在移除已停止的容器…',
   'Restart': '重启',
   'Resume': '恢复',
   'Shell': '终端',
@@ -123,14 +127,36 @@ const ZH: Record<string, string> = {
   'No active containers.': '没有活动容器。',
 };
 
+// Job verbs the service puts into labels (`Stopping web`); the panel renders
+// them with `…`, so the running forms carry the ellipsis here.
+const RUNNING: Record<string, string> = {
+  Starting: '启动',
+  Stopping: '停止',
+  Restarting: '重启',
+  Pausing: '暂停',
+  Resuming: '恢复',
+  Removing: '移除',
+  Pulling: '拉取',
+  'Taking down': '停止',
+};
+
 const PATTERNS: Array<[RegExp, (...match: string[]) => string]> = [
   [/^Starting (.+)…$/, (_all, name) => `正在启动 ${name}…`],
+  [/^(Stopping|Restarting|Pausing|Resuming|Removing|Pulling|Taking down) (.+)…$/, (_all, verb, name) => `正在${RUNNING[verb]} ${name}…`],
+  [/^(Starting|Stopping|Restarting|Pausing|Resuming|Removing|Pulling|Taking down) (.+) failed: ([\s\S]+)$/, (_all, verb, name, reason) => `正在${RUNNING[verb]} ${name} 失败：${reason}`],
   [/^Start (.+)$/, (_all, name) => `启动 ${name}`],
+  [/^Pulled (.+)$/, (_all, name) => `已拉取 ${name}`],
+  [/^(.+) is up$/, (_all, name) => `${name} 已启动`],
+  [/^(.+) is down$/, (_all, name) => `${name} 已停止`],
+  [/^Stopped (.+)$/, (_all, name) => `已停止 ${name}`],
+  [/^Restarted (.+)$/, (_all, name) => `已重启 ${name}`],
+  [/^Freed (.+)$/, (_all, size) => `释放 ${size}`],
+  [/^(.+) started$/, (_all, name) => `${name} 已启动`],
   [/^(.+) isn't installed$/, (_all, name) => `未安装 ${name}`],
   [/^(.+) isn't running$/, (_all, name) => `${name} 未运行`],
   [/^context (.+)$/, (_all, name) => `上下文 ${name}`],
   [/^(.+) isn't running\.$/, (_all, name) => `${name} 未运行。`],
-  [/^(.+) failed: ([\s\S]+)$/, (_all, label, reason) => `${label} 失败：${reason}`],
+  [/^(.+) failed: ([\s\S]+)$/, (_all, label, reason) => `${t(label)} 失败：${reason}`],
   [/^Open (.+)$/, (_all, url) => `打开 ${url}`],
   [/^Open (.+) \(container port (\d+)\)$/, (_all, url, port) => `打开 ${url}（容器端口 ${port}）`],
   [/^\+(\d+) more$/, (_all, count) => `还有 ${count} 项`],

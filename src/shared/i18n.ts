@@ -31,7 +31,7 @@ const ZH: Record<string, string> = {
   'Delete': '删除',
   'Disk': '磁盘',
   'Disk space Docker uses on this machine': 'Docker 在此机器上占用的磁盘空间',
-  'Down': '停止（Down）',
+  'Down': '停止',
   'Each command runs on its own with sh -c, in the folder the last one left. Nothing interactive: no editors, no prompts, 18 seconds at most.': '每条命令通过 sh -c 独立执行，工作目录沿用上一条命令结束时的位置。不支持交互：没有编辑器，也没有提示，最长 18 秒。',
   'Entrypoint': '入口点',
   'Environment': '环境变量',

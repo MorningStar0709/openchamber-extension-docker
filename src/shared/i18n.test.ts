@@ -50,13 +50,20 @@ describe('job labels from the service', () => {
       expect(t(`${verb} web failed: exit 1`), verb).not.toContain('undefined');
       expect(t(`${verb} web failed: exit 1`), verb).not.toContain(verb);
     }
+    // Exact answers, not just "has Chinese": a renamed prune label that
+    // starts with a RUNNING verb would pass a loose sweep via the generic
+    // verb pattern while still leaking English (`正在移除 dangling images…`).
+    const PRUNE_ZH: Record<string, [running: string, failed: string]> = {
+      'Removing unused images': ['正在移除未使用的镜像…', '移除未使用的镜像 失败：exit 1'],
+      'Removing unused volumes': ['正在移除未使用的卷…', '移除未使用的卷 失败：exit 1'],
+      'Removing stopped containers': ['正在移除已停止的容器…', '移除已停止的容器 失败：exit 1'],
+      'Clearing the build cache': ['正在清空构建缓存…', '清空构建缓存 失败：exit 1'],
+    };
     for (const { label } of Object.values(PRUNE)) {
-      expect(t(`${label}…`), label).toMatch(hasChinese);
-      expect(t(`${label}…`), label).not.toContain(label);
-      // A failed prune toast must not fall into the generic verb pattern and
-      // half-translate (`正在移除 unused images 失败：…`).
-      expect(t(`${label} failed: exit 1`), label).toMatch(hasChinese);
-      expect(t(`${label} failed: exit 1`), label).not.toContain(label);
+      const expected = PRUNE_ZH[label];
+      if (!expected) throw new Error(`prune label "${label}" needs an exact pin in i18n.test.ts`);
+      expect(t(`${label}…`), label).toBe(expected[0]);
+      expect(t(`${label} failed: exit 1`), label).toBe(expected[1]);
     }
     // Composed row details translate their parts before joining; a pattern
     // must never rewrite one from the outside.

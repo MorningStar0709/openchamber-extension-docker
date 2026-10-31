@@ -70,8 +70,9 @@ export const localizeTree = (root: HTMLElement): void => {
     const parent = node.parentElement;
     // Data, not UI: log lines, shell transcripts and command output must
     // reach the reader verbatim — the patterns would rewrite e.g.
-    // "worker started" into half-Chinese.
-    if (!parent || skipped.has(parent.tagName) || parent.closest('.output, .logs, .log-line, .cmd, .out, .exit, pre, code')) continue;
+    // "worker started" into half-Chinese. The log pane's own container is not
+    // skipped: its "Reading logs…" placeholder is UI and must translate.
+    if (!parent || skipped.has(parent.tagName) || parent.closest('.output, .log-line, .cmd, .out, .exit, pre, code')) continue;
     nodes.push(node);
   }
   for (const node of nodes) {

@@ -146,11 +146,15 @@ const RUNNING: Record<string, string> = {
   'Taking down': '停止',
 };
 
-const RUNNING_ALTS = Object.keys(RUNNING).join('|');
+// Keys are interpolated into the patterns below; escape metacharacters so a
+// future verb like `Re-creating (fast)` matches literally instead of breaking
+// the expression.
+const escapeAlt = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const RUNNING_ALTS = Object.keys(RUNNING).map(escapeAlt).join('|');
 // The four cleanup job labels from src/service/actions.ts PRUNE, spelled out
 // so a failed prune reads fully Chinese; the guard test pins this list to the
 // table, and the bare dictionary keys above to the answers.
-const PRUNE_ALTS = ['Removing unused images', 'Removing unused volumes', 'Removing stopped containers', 'Clearing the build cache'].join('|');
+const PRUNE_ALTS = ['Removing unused images', 'Removing unused volumes', 'Removing stopped containers', 'Clearing the build cache'].map(escapeAlt).join('|');
 
 const PATTERNS: Array<[RegExp, (...match: string[]) => string]> = [
   [new RegExp(`^(${PRUNE_ALTS}) failed: ([\\s\\S]+)$`), (_all, label, reason) => `${t(label)} 失败：${reason}`],

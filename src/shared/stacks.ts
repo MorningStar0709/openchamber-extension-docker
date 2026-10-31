@@ -107,7 +107,9 @@ export const stateLine = (row: Container, now = Date.now()): string => {
   switch (row.state) {
     case 'running': {
       const up = since(row.startedAt, now);
-      if (up === 'seconds') return 'just started';
+      // Both spellings, like ago() above: `span` localizes, so the English
+      // sentinel alone never matches under zh and `up 秒` would render.
+      if (up === 'seconds' || up === '秒') return 'just started';
       return up ? `up ${up}` : 'running';
     }
     case 'restarting':

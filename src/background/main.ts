@@ -4,6 +4,7 @@ import { connectHost } from '@openchamber/sdk';
 
 import { containerChip, findContainer } from '../shared/chip.ts';
 import { fetchSnapshot, messageOf } from '../shared/client.ts';
+import { setLocale } from '../shared/format.ts';
 import { groupContainers, label, needsAttention } from '../shared/stacks.ts';
 
 const host = connectHost();
@@ -11,6 +12,9 @@ let directory: string | null = null;
 
 host.onReady((context) => {
   directory = context.directory;
+  // The chip's title and the resolve errors reach the user, and `span` picks
+  // its units from the locale: without this the frame renders English forever.
+  setLocale(context.locale);
 });
 
 host.onResolve(async ({ args }) => {

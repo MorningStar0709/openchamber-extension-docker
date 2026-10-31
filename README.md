@@ -1,5 +1,7 @@
 # Docker for OpenChamber
 
+> **Fork notice.** This repository is a Chinese-focused fork of [openchamber/openchamber-extension-docker](https://github.com/openchamber/openchamber-extension-docker). Under a Chinese locale the whole UI — panel, status section, menus and toasts — renders in pure Chinese, without `中文（English）` glosses, and the language follows OpenChamber's own setting; the English UI is untouched. See [Upstream and sync](#upstream-and-sync).
+
 Your project's containers next to the chat. The Docker panel puts the Compose stack of the open project first, with live CPU and memory, its ports one click away, and Up, Restart and Down for the whole stack. Other stacks fold below it, then containers on their own.
 
 When a container crashes or turns unhealthy, a line under it says why, read from its last log lines by your Small Model. While the panel is closed, the rail icon counts the containers that crashed since you last looked.
@@ -40,6 +42,12 @@ bun run pack       # docker-extension.zip
 ```
 
 The built files are committed: OpenChamber installs extensions from Git without building them. Bump `version` in `package.json` to ship an update.
+
+## Upstream and sync
+
+- **Upstream:** [openchamber/openchamber-extension-docker](https://github.com/openchamber/openchamber-extension-docker). This fork exists because our locale PR upstream ([#1](https://github.com/openchamber/openchamber-extension-docker/pull/1)) saw no movement for a long time, so the Chinese localization is maintained here instead. The upstream PR stays open as a record; new i18n work is not PR'd upstream unless it picks up again.
+- **Sync policy:** merge `upstream/main` periodically. On conflicts in i18n files, this fork's verb tables and guard tests (`src/shared/i18n.ts`, `src/shared/i18n.test.ts`) win — a new upstream verb that reaches the UI must get a translation, and CI goes red until it does.
+- **Install from this fork:** in OpenChamber, Settings → Extensions, add `https://github.com/MorningStar0709/openchamber-extension-docker`.
 
 ## License
 
